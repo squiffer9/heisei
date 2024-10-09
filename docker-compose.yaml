@@ -1,13 +1,30 @@
 version: "3.8"
+
 services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    environment:
+      - SERVER_URL=http://server:${SERVER_PORT}
+
   db:
     image: postgres:14
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-    ports:
-      - "5432:${DB_PORT}"
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
