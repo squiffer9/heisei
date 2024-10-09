@@ -1,0 +1,9 @@
+CREATE TABLE categories (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    slug VARCHAR(50) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX idx_categories_slug ON categories(slug);
