@@ -25,8 +25,9 @@ WORKDIR /root/
 # Copy the binary from builder
 COPY --from=builder /app/main .
 
-# Copy any other necessary files (e.g., config files, migrations)
+# Copy any other necessary files
 COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/.env .
 
 # Expose the port the app runs on
 EXPOSE ${SERVER_PORT}
