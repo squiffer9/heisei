@@ -82,6 +82,20 @@ heisei/
    go build -o heisei_client ./cmd/client
    ```
 
+## Configuration
+
+1. Copy `configs/config.sample.yaml` to `configs/config.yaml`.
+2. Edit `configs/config.yaml` and set your specific configuration values.
+3. For sensitive information like database passwords, use environment variables instead of putting them in the config file:
+
+   ```sh
+   export DB_PASSWORD=your_secure_password
+   ```
+
+The application will load the configuration from `configs/config.yaml` and override values with environment variables if they are set.
+
+Never commit `configs/config.yaml` to version control, as it may contain sensitive information.
+
 ## Usage
 
 1. Start the server:

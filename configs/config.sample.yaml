@@ -1,0 +1,28 @@
+# Server configuration
+server:
+  host: "0.0.0.0"
+  port: 8080
+  debug_mode: false
+
+# Database configuration
+database:
+  host: "localhost"
+  port: 5432
+  user: "user"
+  password: "password"
+  name: "name"
+
+# Logging configuration
+log:
+  level: "info"
+
+# Client configuration
+client:
+  server_url: "http://localhost:8080"
+  ui:
+    language: "en"
+    refresh_rate: 5
+    max_threads: 20
+  connection:
+    timeout: 10
+    retry_attempts: 3
