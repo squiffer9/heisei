@@ -1,21 +1,18 @@
 package models
 
 import (
-	"time"
-
 	"gorm.io/gorm"
+	"strings"
+	"time"
 )
 
 type Post struct {
-	ID        uint           `gorm:"primaryKey" json:"id"`
-	ThreadID  uint           `gorm:"not null" json:"thread_id" validate:"required"`
-	Content   string         `gorm:"type:text;not null" json:"content" validate:"required,min=1,max=10000"`
-	AuthorIP  string         `gorm:"type:inet;not null" json:"author_ip" validate:"required,ip"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
-	IsDeleted bool           `gorm:"not null;default:false" json:"is_deleted"`
-	Thread    Thread         `gorm:"foreignKey:ThreadID" json:"-"`
+	BaseModel
+	ThreadID  uint   `gorm:"not null;index" json:"thread_id" validate:"required"`
+	Content   string `gorm:"type:text;not null" json:"content" validate:"required,min=1,max=10000"`
+	AuthorIP  string `gorm:"type:inet;not null" json:"author_ip" validate:"required,ip"`
+	IsDeleted bool   `gorm:"not null;default:false;index" json:"is_deleted"`
+	Thread    Thread `gorm:"foreignKey:ThreadID;constraint:OnDelete:CASCADE" json:"thread,omitempty"`
 }
 
 func (Post) TableName() string {
@@ -42,14 +39,39 @@ func (p *Post) ToDTO() *PostDTO {
 
 func (dto *PostDTO) ToModel() *Post {
 	return &Post{
-		ID:        dto.ID,
+		BaseModel: BaseModel{
+			ID:        dto.ID,
+			CreatedAt: dto.CreatedAt,
+		},
 		ThreadID:  dto.ThreadID,
 		Content:   dto.Content,
-		CreatedAt: dto.CreatedAt,
 		IsDeleted: dto.IsDeleted,
 	}
 }
 
+// Validate validates the post.
 func (p *Post) Validate() error {
-	return validate.Struct(p)
+	return ValidateStruct(p)
 }
+
+// SoftDelete marks the post as deleted without actually deleting it.
+func (p *Post) SoftDelete(db *gorm.DB) error {
+	return db.Model(p).Update("is_deleted", true).Error
+}
+
+// Restore restores the post.
+func (p *Post) Restore(db *gorm.DB) error {
+	return db.Model(p).Update("is_deleted", false).Error
+}
+
+// GetAuthorIPMasked returns the author IP with the last octet masked.
+func (p *Post) GetAuthorIPMasked() string {
+	parts := strings.Split(p.AuthorIP, ".")
+	if len(parts) == 4 {
+		parts[3] = "xxx"
+		return strings.Join(parts, ".")
+	}
+	return p.AuthorIP
+}
+
+// TODO: Implement the IsEditable()
