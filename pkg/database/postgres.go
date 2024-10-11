@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"heisei/internal/server/config"
+	"heisei/internal/server/models"
 )
 
 // Database wraps the gorm.DB instance and provides additional functionality
@@ -58,6 +59,10 @@ func (db *Database) Ping() error {
 }
 
 // RunMigrations runs database migrations
-func (db *Database) RunMigrations(models ...interface{}) error {
-	return db.AutoMigrate(models...)
+func (db *Database) RunMigrations() error {
+	return db.AutoMigrate(
+		&models.Category{},
+		&models.Thread{},
+		&models.Post{},
+	)
 }
