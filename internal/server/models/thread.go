@@ -1,20 +1,19 @@
 package models
 
 import (
-	"time"
-
 	"gorm.io/gorm"
+	"time"
 )
 
 type Thread struct {
 	ID         uint           `gorm:"primaryKey" json:"id"`
-	CategoryID uint           `gorm:"not null" json:"category_id"`
-	Title      string         `gorm:"size:200;not null" json:"title"`
+	CategoryID uint           `gorm:"not null" json:"category_id" validate:"required"`
+	Title      string         `gorm:"size:200;not null" json:"title" validate:"required,max=200"`
 	CreatedAt  time.Time      `json:"created_at"`
 	UpdatedAt  time.Time      `json:"updated_at"`
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`
 	LastPostAt time.Time      `gorm:"not null" json:"last_post_at"`
-	PostCount  int            `gorm:"not null;default:0" json:"post_count"`
+	PostCount  int            `gorm:"not null;default:0" json:"post_count" validate:"min=0"`
 	Category   Category       `gorm:"foreignKey:CategoryID" json:"-"`
 }
 
@@ -51,4 +50,8 @@ func (dto *ThreadDTO) ToModel() *Thread {
 		LastPostAt: dto.LastPostAt,
 		PostCount:  dto.PostCount,
 	}
+}
+
+func (t *Thread) Validate() error {
+	return validate.Struct(t)
 }

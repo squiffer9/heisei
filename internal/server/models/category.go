@@ -8,8 +8,8 @@ import (
 
 type Category struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
-	Name      string         `gorm:"size:50;not null" json:"name"`
-	Slug      string         `gorm:"size:50;not null;uniqueIndex" json:"slug"`
+	Name      string         `gorm:"size:50;not null" json:"name" validate:"required,max=50"`
+	Slug      string         `gorm:"size:50;not null;uniqueIndex" json:"slug" validate:"required,max=50,alphanum"`
 	CreatedAt time.Time      `json:"created_at"`
 	UpdatedAt time.Time      `json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
