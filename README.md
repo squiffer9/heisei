@@ -55,7 +55,7 @@ heisei/
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yourusername/heisei.git
+   git clone https://github.com/squiffer9/heisei.git
    cd heisei
    ```
 
