@@ -171,3 +171,35 @@ func (r *ThreadRepository) UpdateLastPostAtWithTx(ctx context.Context, tx *gorm.
 	}
 	return nil
 }
+
+// GetAllPagenated retrieves all threads with pagination
+func (r *ThreadRepository) GetAllPagenated(ctx context.Context, pagination *models.Pagination) ([]models.Thread, error) {
+	var threads []models.Thread
+	var total int64
+	result := r.db.WithContext(ctx).Model(&models.Thread{}).Count(&total)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	pagination.SetTotal(total)
+	result = r.db.WithContext(ctx).Limit(pagination.Limit).Offset(pagination.Offset).Find(&threads)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return threads, nil
+}
+
+// GetByCategoryPaginated retrieves threads by category ID with Pagination
+func (r *ThreadRepository) GetByCategoryPaginated(ctx context.Context, categoryID uint, pagination *models.Pagination) ([]models.Thread, error) {
+	var threads []models.Thread
+	var total int64
+	result := r.db.WithContext(ctx).Model(&models.Thread{}).Where("category_id = ?", categoryID).Count(&total)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	pagination.SetTotal(total)
+	result = r.db.WithContext(ctx).Where("category_id = ?", categoryID).Limit(pagination.Limit).Offset(pagination.Offset).Find(&threads)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return threads, nil
+}

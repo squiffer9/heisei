@@ -158,3 +158,20 @@ func (r *PostRepository) SoftDeleteWithTx(ctx context.Context, tx *gorm.DB, id u
 	}
 	return nil
 }
+
+// GetByThreadPaginated retrieves posts by thread ID with pagination
+func (r *PostRepository) GetByThreadPaginated(ctx context.Context, threadID uint, pagination *models.Pagination) ([]models.Post, error) {
+	var posts []models.Post
+	var total int64
+
+	if err := r.db.Model(&models.Post{}).Where("thread_id = ?", threadID).Count(&total).Error; err != nil {
+		return nil, err
+	}
+
+	result := r.db.WithContext(ctx).Where("thread_id = ?", threadID).Offset(pagination.Offset).Limit(pagination.Limit).Find(&posts)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	pagination.SetTotal(total)
+	return posts, nil
+}

@@ -129,3 +129,21 @@ func (r *CategoryRepository) DeleteWithTx(ctx context.Context, tx *gorm.DB, id u
 	}
 	return nil
 }
+
+// GetAllPaginated retrieves all categories with pagination
+func (r *CategoryRepository) GetAllPaginated(ctx context.Context, pagination *models.Pagination) ([]models.Category, error) {
+	var categories []models.Category
+	var total int64
+
+	if err := r.db.Model(&models.Category{}).Count(&total).Error; err != nil {
+		return nil, err
+	}
+
+	result := r.db.WithContext(ctx).Offset(pagination.Offset).Limit(pagination.Limit).Find(&categories)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	pagination.SetTotal(total)
+	return categories, nil
+}
